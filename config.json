@@ -1,0 +1,14 @@
+{
+  "botToken": "",
+
+  "events": [
+    {
+      "name": "hw",
+      "message": "Hello Man",
+      "day": 1,
+      "month": 9,
+      "hour": 8,
+      "minute": 0
+    }
+  ]
+}
