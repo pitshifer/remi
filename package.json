@@ -1,0 +1,26 @@
+{
+  "name": "remi",
+  "version": "1.0.0",
+  "description": "Telegram bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pitshifer/remi.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot"
+  ],
+  "author": "Anton",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/pitshifer/remi/issues"
+  },
+  "homepage": "https://github.com/pitshifer/remi#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.28.0"
+  }
+}
