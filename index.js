@@ -16,7 +16,7 @@ Remi.onText(/([0-1]\d|2[0-3])[: ]([0-5]\d)/, (msg, match) => {
     let hours = match[1];
     let minutes = match[3];
 
-    console.log(match);
+    // console.log(match);
 
     Remi.sendMessage(chatId, hours + 'hour ' + minutes + 'min - this is time');
 });
