@@ -14,6 +14,7 @@ const Repository = function() {
         }
 
         collection.push(newItem);
+        callback();
     };
 
     this.getAll = function*() {
