@@ -4,7 +4,7 @@
   "description": "Telegram bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -14,15 +14,15 @@
     "telegram",
     "bot"
   ],
-  "author": "Anton",
+  "author": "Anton Kvasov",
   "license": "GPLv3",
   "bugs": {
     "url": "https://github.com/pitshifer/remi/issues"
   },
   "homepage": "https://github.com/pitshifer/remi#readme",
   "dependencies": {
+    "bunyan": "^1.8.12",
     "lodash": "^4.17.4",
-    "moment": "^2.18.1",
     "node-telegram-bot-api": "^0.28.0"
   }
 }

@@ -11,8 +11,6 @@ const Task = function(chatId, hours, minutes, msg) {
         hour: hours,
         minute: minutes
     });
-
-    console.info(this.timestamp);
 };
 
 exports.Task = Task;
