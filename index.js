@@ -44,10 +44,10 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     tasks.add(new Task(chatId, hours, minutes, text), function(err, newTask) {
         if (err) {
             logger.error(err)
-            Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.")
+            Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
         } else {
             logger.info({newTask: newTask}, "Accepted new task");
-            Remi.sendMessage(chatId, 'Ok, понял.');
+            Remi.sendMessage(chatId, 'Ok, понял.').catch(logger.error);
         }
     });
 });
@@ -59,7 +59,7 @@ Remi.on('message', (msg) => {
                 logger.error(err);
             } else {
                 logger.info({newUser: newUser}, "Registered new user");
-                Remi.sendMessage(msg.chat.id, 'Здоров, ' + msg.from.first_name);
+                Remi.sendMessage(msg.chat.id, 'Здоров, ' + msg.from.first_name).catch(logger.error);
             }
         });
     }
@@ -70,7 +70,7 @@ Remi.on('message', (msg) => {
             message += user.id + ' ' + user.name + '\n';
         }
 
-        Remi.sendMessage(msg.chat.id, message);
+        Remi.sendMessage(msg.chat.id, message).catch(logger.error);
     }
 
     if (msg.text && msg.text === '/tasks') {
@@ -79,6 +79,6 @@ Remi.on('message', (msg) => {
             message += task.id + ' - ' + ' ' + task.timestamp + ' ' + task.timestamp.format('LLLL') + ' - ' + task.message + '\n';
         }
 
-        Remi.sendMessage(msg.chat.id, message);
+        Remi.sendMessage(msg.chat.id, message).catch(logger.error);
     }
 });
