@@ -1,3 +1,4 @@
 {
-  "botToken": ""
+  "botToken": "",
+  "debugMode": false
 }
