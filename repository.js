@@ -1,7 +1,9 @@
 const _ = require('lodash');
 
-const Repository = function() {
+const Repository = function(name) {
     let collection = [];
+
+    this.name = name;
 
     this.add = function(newItem, callback) {
         let exist = _.find(collection, function(item) {
@@ -14,7 +16,10 @@ const Repository = function() {
         }
 
         collection.push(newItem);
-        callback(null, newItem);
+
+        if (callback) {
+            callback(null, newItem);
+        }
     };
 
     this.getAll = function*() {
@@ -25,6 +30,16 @@ const Repository = function() {
 
     this.count = function() {
         return collection.length;
+    };
+
+    this.isExistById = function(id) {
+        if (collection.length === 0) {
+            return false;
+        }
+
+        return _.find(collection, item => {
+            return item.id === id;
+        })
     }
 };
 

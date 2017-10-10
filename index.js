@@ -3,13 +3,13 @@ const Config = require("./config.json"),
       moment = require("moment"),
       User = require("./models/user").User,
       Task = require("./models/task").Task,
+      Chat = require("./models/chat").Chat,
       Repository = require("./repository").Repository;
       bunyan = require("bunyan");
 
-if (!Config.botToken) {
-    console.error("Token for telegram bot is required.");
-    process.exit(1);
-}
+let users = new Repository('users');
+let tasks = new Repository('tasks');
+let chats = new Repository('chats');
 
 const logger = bunyan.createLogger({
     name: 'main',
@@ -30,10 +30,20 @@ if (Config.debugMode) {
     });
 }
 
-moment.locale('ru');
+if (!Config.botToken) {
+    console.error("Token for telegram bot is required.");
+    process.exit(1);
+}
+
 const Remi = new TelegramBot(Config.botToken, {'polling': true});
-let users = new Repository();
-let tasks = new Repository();
+
+const checkNewChat = (msg) => {
+    if (!chats.isExistById(msg.chat.id)) {
+        chats.add(new Chat(msg));
+    }
+};
+
+moment.locale('ru');
 
 Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     let chatId = msg.chat.id;
@@ -43,7 +53,7 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
 
     tasks.add(new Task(chatId, hours, minutes, text), function(err, newTask) {
         if (err) {
-            logger.error(err)
+            logger.error(err);
             Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
         } else {
             logger.info({newTask: newTask}, "Accepted new task");
@@ -51,6 +61,8 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
         }
     });
 });
+
+Remi.on('message', checkNewChat);
 
 Remi.on('message', (msg) => {
     if (msg.text && msg.text === '/start') {
