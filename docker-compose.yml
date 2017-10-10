@@ -6,6 +6,7 @@ services:
       - NODE_ENV=dev
     volumes:
       - ./:/usr/src/app
+      - ./logs/:/var/log/remi
     working_dir: /usr/src/app
     expose:
       - "80"

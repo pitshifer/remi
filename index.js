@@ -4,10 +4,30 @@ const Config = require("./config.json"),
       User = require("./models/user").User,
       Task = require("./models/task").Task,
       Repository = require("./repository").Repository;
+      bunyan = require("bunyan");
 
 if (!Config.botToken) {
     console.error("Token for telegram bot is required.");
     process.exit(1);
+}
+
+const logger = bunyan.createLogger({
+    name: 'main',
+    level: 'debug',
+    streams: [
+        {
+            path: '/var/log/remi/app.log',
+            level: 'warn'
+        }
+    ]
+});
+
+if (Config.debugMode) {
+    logger.addStream({
+        name: "DebugLogger",
+        stream: process.stdout,
+        level: 'debug'
+    });
 }
 
 moment.locale('ru');
@@ -21,22 +41,24 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     let minutes = match[2];
     let text = match[3].trim();
 
-    tasks.add(new Task(chatId, hours, minutes, text), function(err) {
+    tasks.add(new Task(chatId, hours, minutes, text), function(err, newTask) {
         if (err) {
-            console.error(err);
+            logger.error(err)
+            Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.")
         } else {
-            Remi.sendMessage(chatId, 'Ok, понял');
+            logger.info({newTask: newTask}, "Accepted new task");
+            Remi.sendMessage(chatId, 'Ok, понял.');
         }
     });
 });
 
 Remi.on('message', (msg) => {
     if (msg.text && msg.text === '/start') {
-        console.info(msg);
-        users.add(new User(msg), function(err) {
+        users.add(new User(msg), function(err, newUser) {
             if (err) {
-                console.error(err);
+                logger.error(err);
             } else {
+                logger.info({newUser: newUser}, "Registered new user");
                 Remi.sendMessage(msg.chat.id, 'Здоров, ' + msg.from.first_name);
             }
         });
