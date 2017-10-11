@@ -15,11 +15,11 @@ const Repository = function (name, db, logger) {
         let that = this;
         this.isExistById(item.id, function(err, models) {
             if (err) {
-                logger.error(err);
+                that.logger.error(err);
             } else if (models.length === 0) {
                 (new that.model(item)).save(callback);
             } else {
-                logger.info("Model exist in DB already");
+                that.logger.info("Model exist in DB already");
             }
         });
     };
