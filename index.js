@@ -1,4 +1,4 @@
-const Config = require("./config.json"),
+const Config = require("./remi.json"),
       TelegramBot = require("node-telegram-bot-api"),
       moment = require("moment"),
       Task = require("./models/task").Task,
