@@ -1,15 +1,14 @@
 const Config = require("./config.json"),
       TelegramBot = require("node-telegram-bot-api"),
       moment = require("moment"),
-      User = require("./models/user").User,
       Task = require("./models/task").Task,
       Chat = require("./models/chat").Chat,
-      Repository = require("./repository").Repository;
-      bunyan = require("bunyan");
+      Repository = require("./repositoryMongo").Repository,
+      bunyan = require("bunyan"),
+      mongoose = require("mongoose");
 
-let users = new Repository('users');
-let tasks = new Repository('tasks');
-let chats = new Repository('chats');
+const db = mongoose.createConnection('mongodb:/remi');
+mongoose.Promise = global.Promise;
 
 const logger = bunyan.createLogger({
     name: 'main',
@@ -30,6 +29,11 @@ if (Config.debugMode) {
     });
 }
 
+db.on('error', logger.error);
+
+let tasks = new Repository('task', db, logger);
+let chats = new Repository('chat', db, logger);
+
 if (!Config.botToken) {
     console.error("Token for telegram bot is required.");
     process.exit(1);
@@ -37,13 +41,20 @@ if (!Config.botToken) {
 
 const Remi = new TelegramBot(Config.botToken, {'polling': true});
 
-const checkNewChat = (msg) => {
-    if (!chats.isExistById(msg.chat.id)) {
-        chats.add(new Chat(msg));
-    }
+const ChatRegister = (msg) => {
+    chats.add(new Chat(msg), (err, model) => {
+        if (err) {
+            logger.error(err);
+        } else {
+            logger.info({newChat: model}, 'Register new chat');
+        }
+    });
 };
 
 moment.locale('ru');
+
+
+Remi.on('message', ChatRegister);
 
 Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     let chatId = msg.chat.id;
@@ -62,20 +73,7 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     });
 });
 
-Remi.on('message', checkNewChat);
-
 Remi.on('message', (msg) => {
-    if (msg.text && msg.text === '/start') {
-        users.add(new User(msg), function(err, newUser) {
-            if (err) {
-                logger.error(err);
-            } else {
-                logger.info({newUser: newUser}, "Registered new user");
-                Remi.sendMessage(msg.chat.id, 'Здоров, ' + msg.from.first_name).catch(logger.error);
-            }
-        });
-    }
-
     if (msg.text && msg.text === '/users') {
         let message = 'Всего контактов: ' + users.count() + '\n';
         for (let user of users.getAll()) {
@@ -92,5 +90,16 @@ Remi.on('message', (msg) => {
         }
 
         Remi.sendMessage(msg.chat.id, message).catch(logger.error);
+    }
+
+    if (msg.text && msg.text === '/chats') {
+        chatModel.find((err, chats) => {
+            if (err) {
+                console.error(err);
+            } else {
+                console.log(chats);
+                console.log("COUNT: ", chats.length);
+            }
+        });
     }
 });

@@ -10,4 +10,11 @@ services:
     working_dir: /usr/src/app
     expose:
       - "80"
+    links:
+      - mongodb
     command: ["nodemon", "index.js"]
+
+  mongodb:
+    image: "mongo"
+    volumes:
+      - ./data/db:/data/db
