@@ -2,26 +2,31 @@ const mongoose = require("mongoose");
 
 const Repository = function (name, db, logger) {
     this.name = name;
-    this.db = db;
-    this.logger = logger;
 
-    this.model = this.db.model(this.name, this[name + "Schema"]);
+    const model = db.model(this.name, this[name + "Schema"]);
 
     this.isExistById = (id, callback) => {
-        this.model.find({id: id}, callback);
+        model.find({id: id}, callback);
     };
 
     this.add = (item, callback) => {
-        let that = this;
         this.isExistById(item.id, function(err, models) {
             if (err) {
-                that.logger.error(err);
+                logger.error(err);
             } else if (models.length === 0) {
-                (new that.model(item)).save(callback);
+                (new model(item)).save(callback);
             } else {
-                that.logger.info("Model exist in DB already");
+                logger.info("Model exist in DB already");
             }
         });
+    };
+
+    this.getAll = (callback) => {
+        model.find({}).exec(callback);
+    };
+
+    this. count = () => {
+        return 0;
     };
 };
 

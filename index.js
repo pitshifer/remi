@@ -51,22 +51,20 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
 });
 
 Remi.on('message', (msg) => {
-    if (msg.text && msg.text === '/users') {
-        let message = 'Всего контактов: ' + users.count() + '\n';
-        for (let user of users.getAll()) {
-            message += user.id + ' ' + user.name + '\n';
-        }
-
-        Remi.sendMessage(msg.chat.id, message).catch(logger.error);
-    }
-
     if (msg.text && msg.text === '/tasks') {
-        let message = 'Всего задач: ' + tasks.count() + '\n';
-        for (let task of tasks.getAll()) {
-            message += task.id + ' - ' + ' ' + task.timestamp + ' ' + task.timestamp.format('LLLL') + ' - ' + task.message + '\n';
-        }
+        tasks.getAll((err, tasks) => {
+            if (err) {
+                logger.error(err);
+            } else {
+                let message = 'Всего задач: ' + tasks.length + '\n';
+                for (let task of tasks) {
+                    // message += task.id + ' - ' + ' ' + task.timestamp + ' ' + task.timestamp.format('LLLL') + ' - ' + task.message + '\n';
+                    message += task.id + ' - ' + task.message + '\n';
+                }
 
-        Remi.sendMessage(msg.chat.id, message).catch(logger.error);
+                Remi.sendMessage(msg.chat.id, message).catch(logger.error);
+            }
+        });
     }
 
     if (msg.text && msg.text === '/chats') {
