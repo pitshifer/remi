@@ -30,17 +30,18 @@ Repository.prototype.chatSchema = new mongoose.Schema({
     id: { type: Number },
     type: { type: String },
     firstName: { type: String },
-    lastName: { type: String },
-    date: { type: Date }
+    lastName: { type: String }
 });
 
 // TASK SCHEMA
 Repository.prototype.taskSchema = new mongoose.Schema({
     id: { type: Number },
-    type: { type: String },
-    firstName: { type: String },
-    lastName: { type: String },
-    date: { type: Date }
+    chatId: { type: Number },
+    createdAt: { type: Date, default: Date.now() },
+    message: { type: String },
+    text: { type: String },
+    hours: { type: Number },
+    minutes: { type: Number }
 });
 
 exports.Repository = Repository;

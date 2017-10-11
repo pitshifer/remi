@@ -39,7 +39,7 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     let minutes = match[2];
     let text = match[3].trim();
 
-    tasks.add(new Task(chatId, hours, minutes, text), function(err, newTask) {
+    tasks.add(new Task(msg, hours, minutes, text), function(err, newTask) {
         if (err) {
             logger.error(err);
             Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
