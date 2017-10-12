@@ -25,8 +25,8 @@ const Repository = function (name, db, logger) {
         model.find({}).exec(callback);
     };
 
-    this. count = () => {
-        return 0;
+    this.getModelById = (id, callback) => {
+        model.findOne({id: id}).exec(callback);
     };
 };
 
@@ -35,7 +35,8 @@ Repository.prototype.chatSchema = new mongoose.Schema({
     id: { type: Number },
     type: { type: String },
     firstName: { type: String },
-    lastName: { type: String }
+    lastName: { type: String },
+    timezone: Number
 });
 
 // TASK SCHEMA

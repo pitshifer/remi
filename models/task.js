@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const moment = require('moment');
 
 const Task = function(msg, hours, minutes, text) {
@@ -8,7 +7,7 @@ const Task = function(msg, hours, minutes, text) {
     this.minutes = minutes;
     this.message = msg.text;
     this.text = text;
-    this.timestamp = moment().set({
+    this.date = moment().set({
         hour: hours,
         minute: minutes
     });

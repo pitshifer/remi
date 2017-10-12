@@ -15,6 +15,7 @@ if (!config.botToken) {
 const db = mongoose.createConnection('mongodb:/remi');
 db.on('error', logger.error);
 mongoose.Promise = global.Promise;
+moment.utc();
 moment.locale('ru');
 
 let tasks = new Repository('task', db, logger);
@@ -27,6 +28,33 @@ const ChatRegister = (msg) => {
             logger.error(err);
         } else {
             logger.info({newChat: model}, 'Register new chat');
+
+            Remi.sendMessage(model.id, "Здоров, " + model.firstName);
+            Remi.sendMessage(model.id, "Давай-ка установим время, а то пока я думаю что у тебя сейчас - " + moment().format("D MMMM hh:mm"));
+            Remi.sendMessage(model.id, "Для установки времени набери /time hh:mm");
+        }
+    });
+};
+
+const setTime = (chatId, hours, minutes) => {
+    chats.getModelById(chatId, (err, model) => {
+        if (err) {
+            logger.error(err);
+        } else {
+            let now = moment();
+            let datetime = moment(now);
+            datetime.hour(hours);
+            datetime.minute(minutes);
+
+            model.timezone = datetime.diff(now, "minutes");
+            model.save((err, model) => {
+                if (err) {
+                    logger.error(err);
+                } else {
+                    logger.info("Set timezone for chat");
+                    Remi.sendMessage(model.id, "Отлично, я записал что у тебя сейчас - " + moment().utcOffset(model.timezone).toString('LLLL'));
+                }
+            });
         }
     });
 };
@@ -50,6 +78,10 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     });
 });
 
+Remi.onText(/^\/time\s(\d{2}):(\d{2})$/, (msg, match) => {
+    setTime(msg.chat.id, match[1], match[2]);
+});
+
 Remi.on('message', (msg) => {
     if (msg.text && msg.text === '/tasks') {
         tasks.getAll((err, tasks) => {
@@ -63,17 +95,6 @@ Remi.on('message', (msg) => {
                 }
 
                 Remi.sendMessage(msg.chat.id, message).catch(logger.error);
-            }
-        });
-    }
-
-    if (msg.text && msg.text === '/chats') {
-        chatModel.find((err, chats) => {
-            if (err) {
-                console.error(err);
-            } else {
-                console.log(chats);
-                console.log("COUNT: ", chats.length);
             }
         });
     }
