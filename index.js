@@ -52,7 +52,7 @@ const setTime = (chatId, hours, minutes) => {
                     logger.error(err);
                 } else {
                     logger.info("Set timezone for chat");
-                    Remi.sendMessage(model.id, "Отлично, я записал что у тебя сейчас - " + moment().utcOffset(model.timezone).toString('LLLL'));
+                    Remi.sendMessage(model.id, "Отлично, я записал, что у тебя сейчас - " + moment().utcOffset(model.timezone).toString('LLLL'));
                 }
             });
         }
@@ -67,13 +67,19 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
     let minutes = match[2];
     let text = match[3].trim();
 
-    tasks.add(new Task(msg, hours, minutes, text), function(err, newTask) {
+    chats.getModelById(chatId, (err, chat) => {
         if (err) {
-            logger.error(err);
-            Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
+            logger.error('Не найден чат');
         } else {
-            logger.info({newTask: newTask}, "Accepted new task");
-            Remi.sendMessage(chatId, 'Ok, понял.').catch(logger.error);
+            tasks.add(new Task(msg, chat, hours, minutes, text), function (err, newTask) {
+                if (err) {
+                    logger.error(err);
+                    Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
+                } else {
+                    logger.info({newTask: newTask}, "Accepted new task");
+                    Remi.sendMessage(chatId, 'Ok, понял.').catch(logger.error);
+                }
+            });
         }
     });
 });

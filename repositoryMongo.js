@@ -26,7 +26,7 @@ const Repository = function (name, db, logger) {
     };
 
     this.getModelById = (id, callback) => {
-        model.findOne({id: id}).exec(callback);
+        model.findOne({id: id}, callback);
     };
 };
 
@@ -47,7 +47,8 @@ Repository.prototype.taskSchema = new mongoose.Schema({
     message: { type: String },
     text: { type: String },
     hours: { type: Number },
-    minutes: { type: Number }
+    minutes: { type: Number },
+    dateNotif: Date
 });
 
 exports.Repository = Repository;
