@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const moment = require("moment");
 
 const Repository = function (name, db, logger) {
     this.name = name;
@@ -28,6 +29,15 @@ const Repository = function (name, db, logger) {
     this.getModelById = (id, callback) => {
         model.findOne({id: id}, callback);
     };
+
+    this.getTaskToday = (callback) => {
+        model.find({
+            dateNotif: {
+                "$gte": moment().utc().toDate(),
+                "$lt": moment().utc().add(1, 'minutes').toDate()
+            }
+        }).exec(callback);
+    };
 };
 
 // CHAT SCHEMA
@@ -50,5 +60,9 @@ Repository.prototype.taskSchema = new mongoose.Schema({
     minutes: { type: Number },
     dateNotif: Date
 });
+
+Repository.prototype.taskSchema.methods.findByDate = (date, callback) => {
+    this.model('task').find({"$gte": moment().utc().toDate(), "$lt": moment().utc().add(1, 'days').startOf('day')}).execute(callback);
+};
 
 exports.Repository = Repository;

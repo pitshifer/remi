@@ -22,6 +22,22 @@ let tasks = new Repository('task', db, logger);
 let chats = new Repository('chat', db, logger);
 const Remi = new TelegramBot(config.botToken, {'polling': true});
 
+
+const notifier = () => {
+    tasks.getTaskToday((err, tasks) => {
+        console.log('NOTIFIER DO');
+        if (err) {
+            logger.error(err);
+        } else {
+            for (task of tasks) {
+                Remi.sendMessage(task.chatId, task.message);
+            }
+        }
+    });
+};
+
+setInterval(notifier, 60000);
+
 const ChatRegister = (msg) => {
     chats.add(new Chat(msg), (err, model) => {
         if (err) {
@@ -77,7 +93,7 @@ Remi.onText(/^([0-1]\d|2[0-3])[: ]([0-5]\d)(.+$)/, (msg, match) => {
                     Remi.sendMessage(chatId, "Упс... не понял, что ты имеешь в виду.").catch(logger.error);
                 } else {
                     logger.info({newTask: newTask}, "Accepted new task");
-                    Remi.sendMessage(chatId, 'Ok, понял.').catch(logger.error);
+                    Remi.sendMessage(chatId, 'Ok, понял \u{1F609}').catch(logger.error);
                 }
             });
         }
