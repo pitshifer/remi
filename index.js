@@ -1,10 +1,10 @@
 const config = require("./remi.json"),
       TelegramBot = require("node-telegram-bot-api"),
       moment = require("moment"),
-      Task = require("./models/task").Task,
-      Chat = require("./models/chat").Chat,
-      Repository = require("./repositoryMongo").Repository,
-      logger = require("./logger").Logger('main', config),
+      Task = require("./app/models/task").Task,
+      Chat = require("./app/models/chat").Chat,
+      Repository = require("./app/repositoryMongo").Repository,
+      logger = require("./app/logger").Logger('main', config),
       mongoose = require("mongoose");
 
 if (!config.botToken) {
